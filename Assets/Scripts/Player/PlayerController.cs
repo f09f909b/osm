@@ -2,15 +2,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
    [SerializeField] InputMaster _controls;
    [SerializeField] private Rigidbody2D _rb;
+   [SerializeField] private Transform groundCheck;
+   [SerializeField] private LayerMask groundLayer;
+   
    [SerializeField] private float _speed;
    [SerializeField] private float _jumpStrength;
    private Vector2 _movementInput;
-   private bool _isGrounded;
+   
    private bool _hasJumped;
 
 
@@ -29,7 +33,7 @@ public class PlayerController : MonoBehaviour
 
    private void FixedUpdate()
    {
-     Movement();
+      Movement();
    }
 
    private void OnEnable()
@@ -44,13 +48,21 @@ public class PlayerController : MonoBehaviour
    private void Movement()
    {
       _movementInput = _controls.Player.Movement.ReadValue<Vector2>();
-      _rb.velocity = _movementInput * _speed;
+      _rb.velocity = new Vector2(_movementInput.x * _speed, _rb.velocity.y);
    }
    private void Jump()
    {
-      Debug.Log("I am now jumping Mike!");
-      _rb.AddForce(Vector2.up * _jumpStrength);
+      if (IsGrounded())
+      {
+         _rb.AddForce(new Vector2(_rb.velocity.x,_jumpStrength));
+      }
    }
+
+   private bool IsGrounded()
+   {
+      return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+   }
+
    private void Strike()
    {
       Debug.Log("I am one strike mike!");

@@ -6,17 +6,20 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-   [SerializeField] InputMaster _controls;
+   [SerializeField] private InputMaster _controls;
    [SerializeField] private Rigidbody2D _rb;
-   [SerializeField] private Transform groundCheck;
-   [SerializeField] private LayerMask groundLayer;
+   [SerializeField] private Transform _groundCheck;
+   [SerializeField] private LayerMask _groundLayer;
+   [SerializeField] private LayerMask _wallLayer;
+   [SerializeField] private LayerMask _killableLayer;
+   private RaycastHit2D _hit;
+   private RaycastHit2D[] _potentialTargets;
    
    [SerializeField] private float _speed;
    [SerializeField] private float _jumpStrength;
+   private float _strikeLength = Mathf.Infinity;
    private Vector2 _movementInput;
-   
-   private bool _hasJumped;
-
+   private bool _hasStrike;
 
    private void Awake()
    {
@@ -60,11 +63,28 @@ public class PlayerController : MonoBehaviour
 
    private bool IsGrounded()
    {
-      return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+      return Physics2D.OverlapCircle(_groundCheck.position, 0.2f, _groundLayer);
    }
 
    private void Strike()
    {
-      Debug.Log("I am one strike mike!");
+      if (_hasStrike) return;
+      
+      _hit = Physics2D.Raycast(transform.position, transform.right, _strikeLength, _wallLayer);
+      _potentialTargets = Physics2D.RaycastAll(transform.position, transform.right, _strikeLength, _killableLayer); 
+      if (_hit)
+      {
+         ClearKillPath(_potentialTargets);
+         transform.position = _hit.point - new Vector2(0.7f,0);
+      }
+      _hasStrike = true;
+   }
+
+   private void ClearKillPath(RaycastHit2D[] targets)
+   {
+      for (int i = 0; i < targets.Length; i++)
+      {
+         Destroy(targets[i].transform.gameObject);
+      }
    }
 }

@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
    [SerializeField] private LayerMask _groundLayer;
    [SerializeField] private LayerMask _wallLayer;
    [SerializeField] private LayerMask _killableLayer;
+   [SerializeField] private LayerMask _deathLayer;
    private RaycastHit2D _hit;
    private RaycastHit2D[] _potentialTargets;
    
@@ -32,6 +33,7 @@ public class PlayerController : MonoBehaviour
       _controls.Player.Movement.performed += _ => Movement();
       _controls.Player.Jump.performed += _ => Jump();
       _controls.Player.Strike.performed += _ => Strike();
+      _controls.Player.Reset.performed += _ => RestartLevel();
    }
 
    private void FixedUpdate()
@@ -39,6 +41,7 @@ public class PlayerController : MonoBehaviour
       Movement();
    }
 
+   // System
    private void OnEnable()
    {
       _controls.Enable(); 
@@ -48,6 +51,13 @@ public class PlayerController : MonoBehaviour
    {
       _controls.Disable();
    }
+
+   private void RestartLevel()
+   {
+      GameManager.Instance.RestartLevel();
+   }
+
+   // Movement
    private void Movement()
    {
       _movementInput = _controls.Player.Movement.ReadValue<Vector2>();
@@ -65,6 +75,8 @@ public class PlayerController : MonoBehaviour
    {
       return Physics2D.OverlapCircle(_groundCheck.position, 0.2f, _groundLayer);
    }
+   
+   // Abilities
 
    private void Strike()
    {
@@ -82,9 +94,9 @@ public class PlayerController : MonoBehaviour
 
    private void ClearKillPath(RaycastHit2D[] targets)
    {
-      for (int i = 0; i < targets.Length; i++)
+      foreach (var t in targets)
       {
-         Destroy(targets[i].transform.gameObject);
+         Destroy(t.transform.gameObject);
       }
    }
 }

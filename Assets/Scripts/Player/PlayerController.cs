@@ -12,7 +12,6 @@ public class PlayerController : MonoBehaviour
    [SerializeField] private LayerMask _groundLayer;
    [SerializeField] private LayerMask _wallLayer;
    [SerializeField] private LayerMask _killableLayer;
-   [SerializeField] private LayerMask _deathLayer;
    private RaycastHit2D _hit;
    private RaycastHit2D[] _potentialTargets;
    
@@ -77,7 +76,6 @@ public class PlayerController : MonoBehaviour
    }
    
    // Abilities
-
    private void Strike()
    {
       if (_hasStrike) return;

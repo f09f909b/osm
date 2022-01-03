@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
    [SerializeField] private InputMaster _controls;
    [SerializeField] private Rigidbody2D _rb;
    [SerializeField] private Transform _groundCheck;
+   [SerializeField] private GameObject _TopHalfMike;
    [SerializeField] private LayerMask _groundLayer;
    [SerializeField] private LayerMask _wallLayer;
    [SerializeField] private LayerMask _killableLayer;
@@ -76,6 +77,8 @@ public class PlayerController : MonoBehaviour
    }
    
    // Abilities
+   // Old Strike Method for Teleport Attack.
+   /* 
    private void Strike()
    {
       if (_hasStrike) return;
@@ -89,12 +92,24 @@ public class PlayerController : MonoBehaviour
       }
       _hasStrike = true;
    }
-
+   */
    private void ClearKillPath(RaycastHit2D[] targets)
    {
       foreach (var t in targets)
       {
          Destroy(t.transform.gameObject);
+      }
+   }
+
+   private void Strike()
+   {
+      _potentialTargets = Physics2D.RaycastAll(transform.position, transform.right, _strikeLength, _killableLayer); 
+      while (!_hasStrike)
+      {
+        // TODO: Insert Animation For 1 Strike Kick Here + Await First Few Frames to Fire trigger ClearKillPath
+        ClearKillPath(_potentialTargets);
+        Destroy(_TopHalfMike);
+         _hasStrike = true;
       }
    }
 }
